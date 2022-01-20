@@ -1,10 +1,10 @@
 const express = require('express')
-const recipeRouter = require("./recipes/recipe-router")
+const recipeRouter = require("./router")
 
 const server = express()
 
 server.use(express.json())
-server.use('/api/recipes', recipeRouter)
+server.use('/api/', recipeRouter)
 
 server.use((err, req, res, next) => {
     res.status(500).json({

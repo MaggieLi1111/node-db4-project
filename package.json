@@ -2,7 +2,7 @@
   "name": "node-db4-project",
   "version": "1.0.0",
   "scripts": {
-    "server": "ndoemon index.js",
+    "server": "nodemon index.js",
     "start": "node index.js",
     "up": "knex migrate:up",
     "down": "knex migrate:down",
@@ -19,6 +19,7 @@
     "express": "^4.17.2",
     "init": "^0.1.2",
     "knex": "^0.95.15",
+    "knex-cleaner": "^1.3.1",
     "nodemon": "^2.0.15",
     "sqlite": "^4.0.23",
     "sqlite3": "^5.0.2"
