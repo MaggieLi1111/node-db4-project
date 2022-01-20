@@ -1,9 +1,29 @@
 {
   "name": "node-db4-project",
   "version": "1.0.0",
-  "scripts": {},
+  "scripts": {
+    "server": "ndoemon index.js",
+    "start": "node index.js",
+    "up": "knex migrate:up",
+    "down": "knex migrate:down",
+    "latest": "knex migrate:latest",
+    "rollback": "knex migrate:rollback",
+    "seeds": "knex seeds:run"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BloomInstituteOfTechnology/node-db4-project.git"
+  },
+  "dependencies": {
+    "dotenv": "^14.2.0",
+    "express": "^4.17.2",
+    "init": "^0.1.2",
+    "knex": "^0.95.15",
+    "nodemon": "^2.0.15",
+    "sqlite": "^4.0.23",
+    "sqlite3": "^5.0.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.7.0"
   }
 }
