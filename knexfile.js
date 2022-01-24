@@ -1,26 +1,27 @@
 // Update with your config settings.
 
-/**
- * @type { Object.<string, import("knex").Knex.Config> }
- */
-module.exports = {
-
-  development: {
-    client: 'sqlite3',
-    useNullAsDefault: true,
-    connection: {
-      filename: "./data/recipes.db3"
-    },
-    migration: {
-      directory: "./data/migrations"
-    },
-    seeds: {
-      directory: "./data/seeds"
-    },
-    pool: {
-      afterCreate: (conn, done) => {
-        conn.run('PRAGMA foreign_keys = ON', done)
-      }
+const sharedConfig = {
+  client: 'sqlite3',
+  migration: {
+    directory: "./data/migrations"
+  },
+  seeds: {
+    directory: "./data/seeds"
+  },
+  useNullAsDefault: true,
+  pool: {
+    afterCreate: (conn, done) => {
+      conn.run('PRAGMA foreign_keys = ON', done)
     }
+  }
+}
+module.exports = {
+  development: {
+    ...sharedConfig,
+    connection:{ filename:"./data/cook_book.db3"}
+  },
+  testing:{
+    ...sharedConfig,
+    connection:{ filename:"./data/cook_book.test.db3"}
   }
 }
