@@ -1,47 +1,72 @@
 const db = require('../../data/db-config')
 
-async function getRecipeById(recipe_id) {
-    const recipeWithSteps = await db("recipes as r")
-        .select("r.*", "rs.step_id", "rs.step_number", "rs.step_instructions")
-        .leftJoin("recipe_steps as rs", "rs.recipe_id", "r.recipe_id")
-        .where("r.recipe_id", recipe_id)
-        .orderBy("rs.step_number", "asc");
-    
-    const ingredients = await db("ingredients as i")
-        .select("i.*", "si.step_id", "si.ingredient_quantity")
-        .join("steps_ingredients as si", "si.ingredient_id", "i.ingredient_id")
-        .join("recipe_steps as rs", "si.step_id", "rs.step_id")
-        .where("recipe_id", recipe_id)
-        .where("recipe_id", recipe_id);
-
-    let stepsArray = recipeWithSteps.map((rec) => {
-        return {
-            step_id: rec.step_id,
-            step_number: rec.step_number,
-            step_instructions: rec.step_instructions,
-            ingredients: ingredients
-                .filter((ing) => ing.step_id === rec.step_id)
-                .map((ing) => {
-                  return {
-                    ingredient_id: ing.ingredient_id,
-                    ingredient_name: ing.ingredient_name,
-                    quantity: ing.ingredient_quantity,
-                    unit: ing.measurement_unit,
-                  };
-                }),
-            };
-          });
-    let recipeToReturn = {
-        recipe_id: recipeWithSteps[0].recipe_id,
-        recipe_name: recipeWithSteps[0].recipe_name,
-        created_at: recipeWithSteps[0].created_at,
-        steps: stepsArray,
-          };
-
-    return recipeToReturn;
-
+function getRecipeById(recipe_id) {
+    return db("recipes as r")
+    .select("r.*","st.*","sti.amount","i.*")
+    .where("r.recipe_id", recipe_id)
+    .leftJoin("recipe_steps as st", "r.recipe_id", "st.recipe_id")
+    .leftJoin("steps_ingredients as sti", "st.step_id", "sti.step_id")
+    .leftJoin("ingredients as i", "i.ingredient_id", "sti.ingredient_id")
+    .orderBy("st.step_number", "asc")
+    .then(data=>{
+        if (!data || Object.keys(data).length === 0){
+            return []
+        }
+        let arr = []
+        data.map(step=>{
+            console.log(step)
+            if (!step.recipe_id){
+                return arr
+            }
+            let exists = false
+            arr.map(steps=>{
+                if (steps.step_id == step.step_id){
+                    exists = true
+                    if (step.amount) {
+                        let ingredient = {
+                            ingredient_id: step.ingredient_id,
+                            ingredient_name: step.ingredient_name,
+                            amount: step.amount
+                        }
+                        return steps.ingredients.push(ingredient)
+                    }
+                    else {
+                        return steps
+                    }
+                }
+                return steps
+            })
+            if (!exists){
+                let newStep = {
+                    step_id: step.step_id,
+                    step_number: step.step_number,
+                    instructions: step.instructions,
+                }
+                if (step.amount) {
+                    newStep.ingredients = []
+                    let ingredient = {
+                        ingredient_id: step.ingredient_id,
+                        ingredient_name: step.ingredient_name,
+                        amount: step.amount
+                    }
+                    newStep.ingredients.push(ingredient)
+                    
+                } else {
+                    newStep.ingredients = []
+                }
+                arr.push(newStep)
+            }
+        })
+        let finalObject = {
+            recipe_id: data[0].recipe_id,
+            recipe_name: data[0].recipe_name,
+            steps: arr
+        }
+        return finalObject
+    })
 }
-        
+
+
 module.exports = {
     getRecipeById
 }
